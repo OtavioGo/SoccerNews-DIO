@@ -1,5 +1,6 @@
 package com.example.soccernews.ui.adapters;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.soccernews.R;
 import com.example.soccernews.databinding.NewsItemBinding;
 import com.example.soccernews.domain.News;
 import com.squareup.picasso.Picasso;
@@ -34,16 +36,19 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Context context = holder.itemView.getContext();
+
         News news = this.news.get(position);
         holder.binding.tvTitle.setText(news.title);
         holder.binding.tvDescription.setText(news.description);
         Picasso.get().load(news.image).fit().into(holder.binding.ivThumbnail);
 
         //Funcionalidade de Abrir Link
+
         holder.binding.btOpenLink.setOnClickListener(view -> {
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(news.link));
-            holder.itemView.getContext().startActivity(i);
+            context.startActivity(i);
         });
 
         //Funcionalidade de Compartilhar
@@ -51,7 +56,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
             Intent i = new Intent(Intent.ACTION_SEND);
             i.setType("text/plain");
             i.putExtra(Intent.EXTRA_TEXT, news.link);
-            holder.itemView.getContext().startActivity(Intent.createChooser(i, "Share via"));
+            context.startActivity(Intent.createChooser(i, "Share via"));
         });
 
         //Funcionalidade de Favoritar
@@ -60,12 +65,9 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
             this.favoriteListener.onFavorite(news);
             notifyItemChanged(position);
         });
-
-        if (news.favorite){
-
-        }else {
-
-        }
+        //Alterando a cor do icon de favoritar
+        int favoriteColor = news.favorite ? R.color.favorite_active : R.color.favorite_inactive;
+        holder.binding.ivFavorite.setColorFilter(context.getResources().getColor(favoriteColor));
     }
 
     @Override
